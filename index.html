@@ -131,6 +131,25 @@
     document.addEventListener('touchmove', function(e) {
       if (e.touches.length > 1) e.preventDefault();
     }, { passive: false });
+
+
+
+
+    // 📩 รับคำสั่งเปลี่ยน document.title จาก iframe (ข้าม origin ผ่าน postMessage)
+window.addEventListener('message', function(event) {
+    // ตรวจสอบว่าข้อความมาจาก Apps Script จริงๆ เพื่อความปลอดภัย
+    if (event.origin !== 'https://script.google.com') return;
+
+    if (event.data && event.data.type === 'setDocTitle') {
+        document.title = event.data.title;
+    }
+});
+
+
+
+
+
+    
   </script>
 
 </body>
