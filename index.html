@@ -102,55 +102,38 @@
     // 🔗 ระบบส่งต่อ URL Parameter ทะลุผ่านเข้า Iframe อัตโนมัติ 🔗
     (function() {
       const baseAppsScriptUrl = "https://script.google.com/macros/s/AKfycbzqrx4R2N4FkoIwlr7MKPwNqs_OSfzUW1J1hfR3HRzpd-bC8YV7oNHmcnP_wnCYlR8A/exec";
-      
-      // ดึงพารามิเตอร์ต่อท้ายจากลิงก์ที่พิมพ์มาบน GitHub Pages เช่น ?page=dashboard
       const currentQueryString = window.location.search;
-      
-      // ประกอบพารามิเตอร์เข้าด้วยกันแล้วฝังลงตัว Iframe
       const finalTargetUrl = baseAppsScriptUrl + currentQueryString;
-      
       document.getElementById("app-frame").src = finalTargetUrl;
     })();
 
-    // ฟังก์ชันซ่อนหน้าจอ Loading เมื่อ Iframe โหลดเสร็จเรียบร้อย
+    // ฟังก์ชันซ่อนหน้าจอ Loading เมื่อ Iframe โหลดเสร็จเรียบร้อย (ต้องอยู่ global scope)
     function hideLoading() {
       const loader = document.getElementById('loading-screen');
       const frame = document.getElementById('app-frame');
-      
-      // แสดงผลบอร์ด iframe หลักออกมา
       frame.style.display = 'block';
-      
-      // เฟดหน้าจอโหลดสีขาวออกแบบนุ่มนวล
       loader.style.opacity = '0';
       setTimeout(() => {
         loader.style.display = 'none';
       }, 400);
     }
 
+    // 📩 รับคำสั่งเปลี่ยน document.title จาก iframe (ข้าม origin ผ่าน postMessage)
+    window.addEventListener('message', function(event) {
+      if (event.origin !== 'https://script.google.com') return;
+      if (event.data && event.data.type === 'setDocTitle') {
+        document.title = event.data.title;
+      }
+    });
+
     // ป้องกันการลากเพื่อ Refresh (Pull-to-refresh) บนมือถือในบาง Browser
     document.addEventListener('touchmove', function(e) {
       if (e.touches.length > 1) e.preventDefault();
     }, { passive: false });
+</script>
 
 
-
-
-    // 📩 รับคำสั่งเปลี่ยน document.title จาก iframe (ข้าม origin ผ่าน postMessage)
-window.addEventListener('message', function(event) {
-    // ตรวจสอบว่าข้อความมาจาก Apps Script จริงๆ เพื่อความปลอดภัย
-    if (event.origin !== 'https://script.google.com') return;
-
-    if (event.data && event.data.type === 'setDocTitle') {
-        document.title = event.data.title;
-    }
-});
-
-
-
-
-
-    
-  </script>
+  
 
 </body>
 </html>
